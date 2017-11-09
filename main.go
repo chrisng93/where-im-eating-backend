@@ -7,6 +7,7 @@ import (
 
 	"github.com/chrisng93/where-im-eating-backend/api"
 	"github.com/chrisng93/where-im-eating-backend/db"
+	"github.com/gorilla/handlers"
 	flags "github.com/jessevdk/go-flags"
 )
 
@@ -28,7 +29,7 @@ func main() {
 	}
 
 	dbOps := db.Init(options.DBUsername, options.DBPassword, options.DBHost, options.DBName)
-	r := api.Init(dbOps)
+	router := api.Init(dbOps)
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", options.Port), r))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", options.Port), handlers.CORS()(router)))
 }
