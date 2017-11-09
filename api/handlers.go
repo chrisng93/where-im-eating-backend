@@ -79,9 +79,29 @@ func addRestaurantHandler(w http.ResponseWriter, r *http.Request, dbOps db.Ops) 
 }
 
 func updateRestaurantHandler(w http.ResponseWriter, r *http.Request, dbOps db.Ops) {
+	vars := mux.Vars(r)
+	restaurant := db.Restaurant{}
+	err := json.NewDecoder(r.Body).Decode(&restaurant)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
 
+	err = dbOps.UpdateRestaurant(vars["id"], restaurant)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
 }
 
 func deleteRestaurantHandler(w http.ResponseWriter, r *http.Request, dbOps db.Ops) {
-
+	vars := mux.Vars(r)
+	err := dbOps.DeleteRestaurant(vars["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
 }

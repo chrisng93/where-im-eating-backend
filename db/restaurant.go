@@ -25,3 +25,12 @@ func (ops Ops) InsertRestaurant(restaurant Restaurant) (*bson.ObjectId, error) {
 	}
 	return &restaurant.ID, nil
 }
+
+func (ops Ops) UpdateRestaurant(id string, restaurant Restaurant) error {
+	_, err := ops.collection.UpsertId(bson.ObjectIdHex(id), &restaurant)
+	return err
+}
+
+func (ops Ops) DeleteRestaurant(id string) error {
+	return ops.collection.RemoveId(bson.ObjectIdHex(id))
+}
