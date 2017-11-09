@@ -9,11 +9,26 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func getRestaurantsHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("test"))
+func getRestaurantsHandler(w http.ResponseWriter, r *http.Request, dbOps db.Ops) {
+	restaurants, err := dbOps.GetRestaurants()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	stringified, err := json.Marshal(restaurants)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(stringified))
 }
 
-func getRestaurantHandler(w http.ResponseWriter, r *http.Request) {
+func getRestaurantHandler(w http.ResponseWriter, r *http.Request, dbOps db.Ops) {
 	vars := mux.Vars(r)
 	restaurant, err := dbOps.GetRestaurant(vars["id"])
 	if err != nil {
@@ -22,7 +37,7 @@ func getRestaurantHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stringifed, err := json.Marshal(restaurant)
+	stringified, err := json.Marshal(restaurant)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -30,10 +45,10 @@ func getRestaurantHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(stringifed))
+	w.Write([]byte(stringified))
 }
 
-func addRestaurantHandler(w http.ResponseWriter, r *http.Request) {
+func addRestaurantHandler(w http.ResponseWriter, r *http.Request, dbOps db.Ops) {
 	restaurant := db.Restaurant{}
 	err := json.NewDecoder(r.Body).Decode(&restaurant)
 	if err != nil {
@@ -63,10 +78,10 @@ func addRestaurantHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(stringified))
 }
 
-func updateRestaurantHandler(w http.ResponseWriter, r *http.Request) {
+func updateRestaurantHandler(w http.ResponseWriter, r *http.Request, dbOps db.Ops) {
 
 }
 
-func deleteRestaurantHandler(w http.ResponseWriter, r *http.Request) {
+func deleteRestaurantHandler(w http.ResponseWriter, r *http.Request, dbOps db.Ops) {
 
 }
